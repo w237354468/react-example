@@ -9,7 +9,15 @@ import UseStateExample from "./js/funcComponent/UseStateExample";
 import ProductList from "./js/product/ProductList";
 import TimersDashBoard from "./js/timer/TimersDashBoard";
 import BlackSea from "./js/util/BlackSea";
-import {Route, NavLink, Outlet, Routes, useLocation, useParams} from "react-router-dom";
+import {
+    Route,
+    NavLink,
+    Outlet,
+    Routes,
+    useLocation,
+    useParams,
+    Link
+} from "react-router-dom";
 import {RouterBlackSea} from "./js/util/RouterBlackSea";
 import {getRoutes, login} from "./js/api/ApiHandler";
 
@@ -37,7 +45,7 @@ function App(props) {
                             <nav>
                                 <ul>
                                     <li><NavLink to={'/'}>首页</NavLink></li>
-                                    <li><NavLink to={'/123123'}>路径ID</NavLink></li>
+                                    <li><NavLink to={'/p/123123'}>路径ID</NavLink></li>
                                     <li><NavLink to={'blackSea'}>RouterBlackSea</NavLink></li>
                                     <li><a href={'dev1'}>dev1</a></li>
                                     <li><NavLink to={'dev2'}>dev2</NavLink></li>
@@ -45,11 +53,21 @@ function App(props) {
                             </nav>
                             <Outlet/> {/*will be rendered along with each child route's element prop,*/}
                         </div>}>
-                        <Route path={'/'} index={false} element={<div><h1>首页</h1></div>}/>
+                        {/*index属性是默认的子级路由*/}
+                        <Route path={'/'} element={<IndexPage/>}/>
+                        <Route path={'ccc'}>
+                            <Route path="subpage" element={<p>SubPage</p>}/>
+                        </Route>
                         {/* 如果是element引用方法的话，必须返回组件，且应该调用方法(否则获取不到param)*/}
                         {/*请注意，不要在 element 属性中使用函数调用，而是直接使用 JSX 表达式或 React 组件*/}
-                        <Route path={'/:a'} loader={({params}) => {
+                        <Route path={'/p/:a'} loader={({params}) => {
                             return params.a;
+                        }} handle={{
+                            // you can put whatever you want on a route handle
+                            // here we use "crumb" and return some elements,
+                            // this is what we'll render in the breadcrumbs
+                            // for this route
+                            crumb: () => <NavLink to="/messages">Messages</NavLink>,
                         }} element={renderDynamicParamTag()}/>
                         <Route path={'/blackSea'} element={<RouterBlackSea/>}/> {/*loader用来加载数据 HTTP或其他*/}
                         <Route path={'/dev1'} element={Dev1Component()}/>
@@ -77,6 +95,17 @@ function App(props) {
     }
 }
 
+function IndexPage() {
+    const { state }  = useLocation();
+    console.log(state)
+    return (
+        <div>
+            <h1>首页</h1>
+            {state && <p>Received data: {state.current}</p>}
+        </div>
+    );
+}
+
 const Dev1Component = () => {
     return (
         <div>
@@ -98,13 +127,20 @@ const Dev2Component = () => {
 function renderDynamicParamTag() {
     function DynamicParamTag() {
         let param = useParams();
-        console.log(JSON.stringify(param))
+        let location = useLocation();
+
         return (
             <div>
                 {/*<h2>路径上的ID是 {JSON.stringify(useLoaderData1)}</h2>*/}
                 <h2>路径上的ID是 {param.a}</h2>
+                {/*通过点击close按钮，跳转到首页，因为实际开发中，可能路径总会变化，所以通过这种方式，更灵活*/}
+                {/*<NavLink to={match.pathname}/>*/}
+                <div>
+                    <Link to={location.pathname + '/close'}>返回</Link>
+                </div>
             </div>);
     }
+
     return <DynamicParamTag/>
 }
 
@@ -113,9 +149,11 @@ function NotFound() {
 
     return (
         <div align={'center'}>
-            <h2>Page Not Found! <br/>
+            <h2>Page Not Found! {location.pathname}
+                <br/>
                 <font color={'red'}>
-                    {location.pathname}
+                    <br/>
+                    {JSON.stringify(location)}
                 </font></h2>
         </div>
     );

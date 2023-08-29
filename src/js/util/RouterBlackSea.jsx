@@ -1,10 +1,11 @@
-import {useNavigate} from 'react-router-dom'
+import {useLocation, useNavigate} from 'react-router-dom'
 import {useEffect, useState} from "react";
 
 export const RouterBlackSea = () => {
 
     let [counter, setCounter] = useState(3);
     let navigateFunction = useNavigate();
+    const {pathname} = useLocation();
 
     // 模拟ComponentDidMount
     useEffect(() => {
@@ -27,7 +28,7 @@ export const RouterBlackSea = () => {
             <p>Redirecting in {counter} seconds</p>
             {
                 (counter < 1) ? (
-                    navigateFunction('/')
+                    navigateFunction('/', {state: {'current':pathname}})
                 ) : null
             }
         </div>

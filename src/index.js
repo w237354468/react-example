@@ -18,7 +18,7 @@ if (useMyRoute) {
     );
 } else {
     root.render(
-        <Router>
+        <Router basename={'/lcdp'}>
             <App useMyRoute={useMyRoute}/>
         </Router>
     );
