@@ -20,6 +20,9 @@ import {
 } from "react-router-dom";
 import {RouterBlackSea} from "./js/util/RouterBlackSea";
 import {getRoutes, login} from "./js/api/ApiHandler";
+import MyReduxTest from "./js/redux/MyReducer";
+import ReduxApp from "./js/redux/ReduxApp";
+import ReduxChat from "./js/redux/ReduxChat";
 
 function App(props) {
 
@@ -51,12 +54,20 @@ function App(props) {
                                     <li><NavLink to={'dev2'}>dev2</NavLink></li>
                                 </ul>
                             </nav>
-                            <Outlet/> {/*will be rendered along with each child route's element prop,*/}
+                            <Outlet>outlet</Outlet> {/*will be rendered along with each child route's element prop,*/}
                         </div>}>
                         {/*index属性是默认的子级路由*/}
                         <Route path={'/'} element={<IndexPage/>}/>
                         <Route path={'ccc'}>
-                            <Route path="subpage" element={<p>SubPage</p>}/>
+                            <Route path="subpage" element={
+                                <div>
+                                    <p>SubPage</p>
+                                    <MyReduxTest/>
+                                    <hr/>
+                                    <ReduxApp/>
+                                    <hr/>
+                                    <ReduxChat/>
+                                </div>}/>
                         </Route>
                         {/* 如果是element引用方法的话，必须返回组件，且应该调用方法(否则获取不到param)*/}
                         {/*请注意，不要在 element 属性中使用函数调用，而是直接使用 JSX 表达式或 React 组件*/}
@@ -96,7 +107,7 @@ function App(props) {
 }
 
 function IndexPage() {
-    const { state }  = useLocation();
+    const {state} = useLocation();
     console.log(state)
     return (
         <div>
